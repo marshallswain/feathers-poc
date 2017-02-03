@@ -1,15 +1,22 @@
-import feathers from 'feathers';
-import rest from 'feathers-rest';
-import bodyParser from 'body-parser';
-import auth from 'feathers-authentication';
-import jwt from 'feathers-authentication-jwt';
-import hooks from 'feathers-hooks';
-import errorHandler from 'feathers-errors/handler';
-import memory from 'feathers-memory';
-import sequelize from 'feathers-sequelize';
-import cors from 'cors';
-import socketio from 'feathers-socketio';
+const feathers = require('feathers');
+const rest = require('feathers-rest');
+const bodyParser = require('body-parser');
+const auth = require('feathers-authentication');
+const jwt = require('feathers-authentication-jwt');
+const local = require('feathers-authentication-local');
+const hooks = require('feathers-hooks');
+const errorHandler = require('feathers-errors/handler');
+const NeDB = require('nedb');
+const feathersNedb = require('feathers-nedb');
+const sequelize = require('feathers-sequelize');
+const cors = require('cors');
+const socketio = require('feathers-socketio');
 const db = require('./models');
+
+const nedb = new NeDB({
+  filename: './db-data/messages',
+  autoload: true
+});
 
 const init = () => {
   const app = feathers();
@@ -24,7 +31,30 @@ const init = () => {
   app.configure(hooks());
   app.configure(auth({ secret: 'secret' }));
   app.configure(jwt());
-  app.use('/users', memory());
+  app.configure(local());
+  app.use('/users', feathersNedb({
+    Model: nedb
+  }));
+
+  app.service('/users').hooks({
+    before: {
+      create: [
+        local.hooks.hashPassword()
+      ]
+    }
+  });
+
+  app.service('/authentication').hooks({
+    before: {
+      create: [
+        auth.hooks.authenticate(['jwt', 'local']),
+        function (hook) {
+          console.log(hook.data);
+          console.log(hook.params);
+        }
+      ]
+    }
+  });
 
   Object.keys(db.sequelize.models)
     .map(key => {
@@ -48,4 +78,4 @@ const init = () => {
   app.listen(3030);
 };
 
-export const run = () => init();
+module.exports = () => init();
