@@ -77,4 +77,4 @@ const init = () => {
   app.listen(3030);
 };
 
-export const run = () => init();
+exports.run = () => init();
