@@ -5,10 +5,7 @@ import client from './client';
 class App extends Component {
   constructor () {
     super();
-    client.authenticate({
-      strategy: 'jwt',
-      endpoint: '/authorization'
-    })
+    client.authenticate()
     .then(res => {
       console.log(res);
       client.service('/db/film').get(1)
