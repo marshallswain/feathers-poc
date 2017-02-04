@@ -46,9 +46,8 @@ const init = () => {
 
   app.service('/authentication').hooks({
     before: {
-      create: [
-        auth.hooks.authenticate(['jwt', 'local']),
-        function (hook) {
+      all: [
+        (hook) => {
           console.log(hook.data);
           console.log(hook.params);
         }
@@ -78,4 +77,4 @@ const init = () => {
   app.listen(3030);
 };
 
-module.exports = () => init();
+export const run = () => init();

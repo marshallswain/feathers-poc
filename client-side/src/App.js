@@ -5,16 +5,16 @@ import client from './client';
 class App extends Component {
   constructor () {
     super();
-    var loginData = {};
-    if (!window.localStorage.getItem('feathers-jwt')) {
-      loginData = {
-        strategy: 'local',
-        email: 'marshall@creativeideal.net',
-        password: 'feathers'
-      };
-    }
-    client.authenticate(loginData)
-    .then(console.log)
+    client.authenticate({
+      strategy: 'jwt',
+      endpoint: '/authorization'
+    })
+    .then(res => {
+      console.log(res);
+      client.service('/db/film').get(1)
+      .then(console.log)
+      .catch(console.error);
+    })
     .catch(console.error);
   }
   render () {
