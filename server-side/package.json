@@ -4,7 +4,7 @@
   "description": "Standalone Repository for a Job Queuer",
   "main": "bootstrap.js",
   "scripts": {
-    "start": "nodemon -w *.js"
+    "start": "nodemon -w bootstrap.js"
   },
   "repository": {
     "type": "git",
